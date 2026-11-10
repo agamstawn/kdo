@@ -20,6 +20,16 @@ Base URL: `/api/v1`. Semua request dan respons memakai JSON.
 
 Tambahkan prefix `/api/v1` pada seluruh path pada tabel.
 
+## Filter dan pagination collection
+
+Semua endpoint collection menerima `page` dan `per_page` (maksimum 50), lalu mengembalikan metadata berikut:
+
+```json
+{ "data": [], "meta": { "page": 1, "per_page": 10, "total_count": 0, "total_pages": 1 } }
+```
+
+Filter yang tersedia: `q` untuk semua collection; `perangkat_daerah_id` untuk pegawai/kendaraan; `status` untuk kendaraan; dan `kendaraan_dinas_id` untuk riwayat perawatan.
+
 ## Payload kendaraan
 
 ```json

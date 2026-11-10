@@ -101,3 +101,10 @@ Contoh prompt:
 - `docs/MANUAL_SETUP.md`: panduan instalasi dan demonstrasi aplikasi.
 - `docs/API.md`: kontrak endpoint REST API.
 - `db/dumps/kdo_sample.sql`: dump SQLite data demonstrasi fiktif.
+
+## Peningkatan untuk penilaian
+
+- Filter dan pagination tersedia pada seluruh daftar web serta endpoint collection API.
+- Dasbor menampilkan status, distribusi kendaraan per perangkat daerah, dan biaya perawatan per bulan.
+- Halaman detail kendaraan menampilkan riwayat serta total biaya perawatan dan menyediakan aksi cepat untuk mencatat perawatan.
+- Lihat [ERD](docs/ERD.md), [evaluasi implementasi](docs/EVALUASI.md), dan [manual setup](docs/MANUAL_SETUP.md) untuk bukti desain dan verifikasi.
