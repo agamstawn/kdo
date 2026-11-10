@@ -25,6 +25,9 @@ class DetailActionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", @perangkat_daerah.nama
     assert_select "a", "Kembali ke perangkat daerah"
+    assert_select "#pegawai-terkait a", @pegawai.nama
+    assert_select "#kendaraan-terkait a", @kendaraan.nomor_polisi
+    assert_select "#kendaraan-terkait", /Toyota Avanza/
 
     get pegawai_url(@pegawai)
     assert_response :success

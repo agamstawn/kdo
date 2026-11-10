@@ -1,1 +1,33 @@
-<section class="page-heading"><div><h1><%= @perangkat_daerah.nama %></h1><p>Detail perangkat daerah.</p></div><div class="detail-actions"><%= link_to "Kembali ke perangkat daerah", perangkat_daerahs_path, class: "button button--secondary" %><%= link_to "Ubah", edit_perangkat_daerah_path(@perangkat_daerah), class: "button" %></div></section><section class="form-card"><dl class="details"><div><dt>Jumlah pegawai</dt><dd><%= @perangkat_daerah.pegawais.count %></dd></div><div><dt>Jumlah kendaraan</dt><dd><%= @perangkat_daerah.kendaraan_dinas.count %></dd></div></dl></section>
+<section class="page-heading">
+  <div><h1><%= @perangkat_daerah.nama %></h1><p>Detail perangkat daerah.</p></div>
+  <div class="detail-actions"><%= link_to "Kembali ke perangkat daerah", perangkat_daerahs_path, class: "button button--secondary" %><%= link_to "Ubah", edit_perangkat_daerah_path(@perangkat_daerah), class: "button" %></div>
+</section>
+
+<section class="form-card">
+  <dl class="details">
+    <div><dt>Jumlah pegawai</dt><dd><%= @pegawai_terkait.count %></dd></div>
+    <div><dt>Jumlah kendaraan</dt><dd><%= @kendaraan_terkait.count %></dd></div>
+  </dl>
+</section>
+
+<section class="related-grid" aria-label="Data terkait perangkat daerah">
+  <section id="pegawai-terkait" class="panel">
+    <div class="panel-header"><div><h2>Pegawai</h2><p class="chart-caption">Pegawai yang tercatat pada perangkat daerah ini.</p></div><span><%= @pegawai_terkait.count %> pegawai</span></div>
+    <table><thead><tr><th>Nama</th><th>Jabatan</th><th>Golongan</th></tr></thead><tbody>
+      <% @pegawai_terkait.each do |pegawai| %>
+        <tr><td><%= link_to pegawai.nama, pegawai, class: "link" %></td><td><%= pegawai.jabatan %></td><td><%= pegawai.golongan %></td></tr>
+      <% end %>
+      <% if @pegawai_terkait.empty? %><tr><td colspan="3" class="empty">Belum ada pegawai pada perangkat daerah ini.</td></tr><% end %>
+    </tbody></table>
+  </section>
+
+  <section id="kendaraan-terkait" class="panel">
+    <div class="panel-header"><div><h2>Kendaraan</h2><p class="chart-caption">Nomor polisi dan nama kendaraan milik perangkat daerah ini.</p></div><span><%= @kendaraan_terkait.count %> kendaraan</span></div>
+    <table><thead><tr><th>Nomor polisi</th><th>Kendaraan</th><th>Status</th></tr></thead><tbody>
+      <% @kendaraan_terkait.each do |kendaraan| %>
+        <tr><td><%= link_to kendaraan.nomor_polisi, show_kendaraan_path(kendaraan), class: "link" %></td><td><%= kendaraan.merek %> <%= kendaraan.model %></td><td><span class="badge badge--<%= kendaraan.status %>"><%= kendaraan.status.titleize %></span></td></tr>
+      <% end %>
+      <% if @kendaraan_terkait.empty? %><tr><td colspan="3" class="empty">Belum ada kendaraan pada perangkat daerah ini.</td></tr><% end %>
+    </tbody></table>
+  </section>
+</section>

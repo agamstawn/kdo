@@ -6,7 +6,10 @@ class PerangkatDaerahsController < ApplicationController
     @perangkat_daerahs = @pagination.records
   end
 
-  def show; end
+  def show
+    @pegawai_terkait = @perangkat_daerah.pegawais.order(:nama)
+    @kendaraan_terkait = @perangkat_daerah.kendaraan_dinas.includes(:penanggung_jawab).order(:nomor_polisi)
+  end
 
   def new
     @perangkat_daerah = PerangkatDaerah.new
