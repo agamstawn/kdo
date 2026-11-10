@@ -10,12 +10,14 @@ Rails.application.routes.draw do
   patch "kendaraan_dinas/:id", to: "kendaraan_dinas#update"
   put "kendaraan_dinas/:id", to: "kendaraan_dinas#update"
   delete "kendaraan_dinas/:id", to: "kendaraan_dinas#destroy"
+  resources :riwayat_perawatans
 
   namespace :api do
     namespace :v1 do
       resources :perangkat_daerahs
       resources :pegawais
       resources :kendaraan_dinas
+      resources :riwayat_perawatans
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

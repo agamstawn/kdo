@@ -16,7 +16,8 @@ KDO mengelola Kendaraan Dinas Operasional, PNS penanggung jawab, dan Perangkat D
 - `PerangkatDaerah` memiliki banyak `Pegawai` dan `KendaraanDinas`.
 - `Pegawai` wajib memiliki NIP unik 18 digit dan satu perangkat daerah.
 - `KendaraanDinas` wajib memiliki nomor polisi unik, perangkat daerah, serta pegawai penanggung jawab dari perangkat daerah yang sama.
-- Status kendaraan hanya: `baik`, `perlu_perawatan`, `rusak`, atau `tidak_aktif`.
+- Status kendaraan hanya: `baik`, `rusak_ringan`, atau `rusak_berat`.
+- `RiwayatPerawatan` mencatat perawatan kendaraan dan tidak boleh dihapus bersama kendaraan secara otomatis.
 - Jangan menghapus perangkat daerah atau pegawai yang masih memiliki relasi aktif; tampilkan kesalahan yang dapat dipahami pengguna.
 
 ## Standar implementasi

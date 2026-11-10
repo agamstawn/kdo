@@ -20,6 +20,7 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag :kdo, "data-turbo-track": "reload" %>
   </head>
 
   <body>
@@ -28,6 +29,7 @@
       <nav aria-label="Navigasi utama">
         <%= link_to "Dasbor", root_path %>
         <%= link_to "Kendaraan", kendaraan_dinas_index_path %>
+        <%= link_to "Perawatan", riwayat_perawatans_path %>
         <%= link_to "Pegawai", pegawais_path %>
         <%= link_to "Perangkat Daerah", perangkat_daerahs_path %>
       </nav>

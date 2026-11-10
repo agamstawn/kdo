@@ -1,8 +1,9 @@
 class KendaraanDinas < ApplicationRecord
   belongs_to :perangkat_daerah
   belongs_to :penanggung_jawab, class_name: "Pegawai"
+  has_many :riwayat_perawatans, class_name: "RiwayatPerawatan", dependent: :restrict_with_error
 
-  enum :status, { baik: 0, perlu_perawatan: 1, rusak: 2, tidak_aktif: 3 }, validate: true
+  enum :status, { baik: 0, rusak_ringan: 1, rusak_berat: 2 }, validate: true
 
   validates :nomor_polisi, :merek, :model, :warna, presence: true
   validates :nomor_polisi, uniqueness: { case_sensitive: false }

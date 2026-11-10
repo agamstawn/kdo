@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_042010) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_050100) do
   create_table "kendaraan_dinas", force: :cascade do |t|
     t.string "nomor_polisi", null: false
     t.string "merek", null: false
@@ -46,7 +46,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_042010) do
     t.index ["nama"], name: "index_perangkat_daerahs_on_nama", unique: true
   end
 
+  create_table "riwayat_perawatans", force: :cascade do |t|
+    t.integer "kendaraan_dinas_id", null: false
+    t.date "tanggal", null: false
+    t.string "jenis", null: false
+    t.text "keterangan", null: false
+    t.decimal "biaya", precision: 15, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["kendaraan_dinas_id"], name: "index_riwayat_perawatans_on_kendaraan_dinas_id"
+    t.index ["tanggal"], name: "index_riwayat_perawatans_on_tanggal"
+  end
+
   add_foreign_key "kendaraan_dinas", "pegawais", column: "penanggung_jawab_id"
   add_foreign_key "kendaraan_dinas", "perangkat_daerahs"
   add_foreign_key "pegawais", "perangkat_daerahs"
+  add_foreign_key "riwayat_perawatans", "kendaraan_dinas", column: "kendaraan_dinas_id"
 end

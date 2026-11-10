@@ -14,6 +14,10 @@ class KendaraanDinasTest < ActiveSupport::TestCase
     assert_predicate kendaraan, :valid?
   end
 
+  test "supports only the three agreed vehicle statuses" do
+    assert_equal %w[baik rusak_ringan rusak_berat], KendaraanDinas.statuses.keys
+  end
+
   test "invalid when responsible employee belongs to a different agency" do
     kendaraan = KendaraanDinas.new(nomor_polisi: "B 2 KDO", merek: "Toyota", model: "Innova", tahun_produksi: 2022, warna: "Hitam", status: :baik, perangkat_daerah: @dinas_a, penanggung_jawab: @pegawai_b)
 
