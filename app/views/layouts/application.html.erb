@@ -25,14 +25,19 @@
 
   <body>
     <header class="topbar">
-      <div class="brand"><%= link_to "KDO", root_path %><span>Manajemen Kendaraan Dinas</span></div>
-      <nav aria-label="Navigasi utama">
-        <%= link_to "Dasbor", root_path %>
-        <%= link_to "Kendaraan", kendaraan_dinas_index_path %>
-        <%= link_to "Perawatan", riwayat_perawatans_path %>
-        <%= link_to "Pegawai", pegawais_path %>
-        <%= link_to "Perangkat Daerah", perangkat_daerahs_path %>
-      </nav>
+      <div class="brand"><%= link_to "KDO", authenticated? ? root_path : new_session_path %><span>Manajemen Kendaraan Dinas</span></div>
+      <% if authenticated? %>
+        <div class="topbar__menu">
+          <nav aria-label="Navigasi utama">
+            <%= link_to "Dasbor", root_path %>
+            <%= link_to "Kendaraan", kendaraan_dinas_index_path %>
+            <%= link_to "Perawatan", riwayat_perawatans_path %>
+            <%= link_to "Pegawai", pegawais_path %>
+            <%= link_to "Perangkat Daerah", perangkat_daerahs_path %>
+          </nav>
+          <div class="user-menu"><span><%= current_user.email_address %></span><%= button_to "Keluar", session_path, method: :delete, class: "user-menu__logout" %></div>
+        </div>
+      <% end %>
     </header>
     <main class="page-shell">
       <% if notice %><div class="flash flash--notice"><%= notice %></div><% end %>

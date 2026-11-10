@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_050100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_110000) do
   create_table "kendaraan_dinas", force: :cascade do |t|
     t.string "nomor_polisi", null: false
     t.string "merek", null: false
@@ -56,6 +56,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_050100) do
     t.datetime "updated_at", null: false
     t.index ["kendaraan_dinas_id"], name: "index_riwayat_perawatans_on_kendaraan_dinas_id"
     t.index ["tanggal"], name: "index_riwayat_perawatans_on_tanggal"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email_address", null: false
+    t.string "password_digest", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   add_foreign_key "kendaraan_dinas", "pegawais", column: "penanggung_jawab_id"

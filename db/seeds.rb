@@ -1,6 +1,13 @@
 # Data demonstrasi fiktif untuk menampilkan alur kerja KDO secara utuh.
 # Jangan gunakan NIP atau nomor polisi ini sebagai data produksi.
 
+admin = User.find_or_initialize_by(email_address: "admin@kdo.test")
+if admin.new_record?
+  admin.password = "KDO-Demo-2026!"
+  admin.password_confirmation = "KDO-Demo-2026!"
+  admin.save!
+end
+
 perangkat_daerah = ["Dinas Pendidikan", "Dinas Kesehatan", "Dinas PUPR"].index_with do |nama|
   PerangkatDaerah.find_or_create_by!(nama: nama)
 end

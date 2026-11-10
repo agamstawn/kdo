@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resource :session, only: %i[new create destroy], path: "sesi"
   root "dashboard#index"
   resources :perangkat_daerahs, path: "perangkat-daerah"
   resources :pegawais, path: "pegawai"
@@ -14,10 +15,10 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :perangkat_daerahs, path: "perangkat-daerah"
-      resources :pegawais, path: "pegawai"
-      resources :kendaraan_dinas, path: "kendaraan"
-      resources :riwayat_perawatans, path: "perawatan"
+      resources :perangkat_daerahs, path: "perangkat-daerah", only: %i[index show create update destroy]
+      resources :pegawais, path: "pegawai", only: %i[index show create update destroy]
+      resources :kendaraan_dinas, path: "kendaraan", only: %i[index show create update destroy]
+      resources :riwayat_perawatans, path: "perawatan", only: %i[index show create update destroy]
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

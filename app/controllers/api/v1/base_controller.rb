@@ -1,5 +1,6 @@
 class Api::V1::BaseController < ApplicationController
   skip_forgery_protection
+  skip_before_action :require_authentication
   before_action :require_api_key_in_production
 
   rescue_from ActiveRecord::RecordNotFound do

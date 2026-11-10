@@ -9,7 +9,9 @@ Aplikasi full-stack Ruby on Rails untuk pendataan kendaraan dinas, kondisi kenda
 - CRUD PNS: nama, NIP, jabatan, golongan, dan perangkat daerah.
 - CRUD perangkat daerah, termasuk data awal Dinas Pendidikan, Dinas Kesehatan, dan Dinas PUPR.
 - Validasi NIP (18 digit), nomor polisi unik, dan keterkaitan penanggung jawab dengan perangkat daerah kendaraan.
-- REST API versi 1 serta halaman web responsif dengan pencarian langsung pada tabel.
+- Autentikasi sesi pengguna untuk seluruh halaman web, disertai pembatasan percobaan masuk dasar.
+- REST API versi 1 dengan API key sebagai perlindungan dasar pada production, serta halaman web responsif pada desktop, tablet, dan ponsel.
+- Fitur bisnis tambahan: catat riwayat perawatan, total biaya per kendaraan, total biaya pada dasbor, dan tren biaya perawatan per bulan.
 
 ## Prasyarat
 
@@ -27,6 +29,16 @@ bin/rails server
 ```
 
 Buka `http://localhost:3000` di peramban.
+
+## Akun demonstrasi
+
+Setelah menjalankan `bin/rails db:seed`, gunakan akun berikut untuk masuk:
+
+| Email | Kata sandi |
+| --- | --- |
+| `admin@kdo.test` | `KDO-Demo-2026!` |
+
+Kredensial ini hanya untuk demonstrasi lokal. Ganti atau buat akun baru sebelum deployment, dan jangan gunakan kata sandi produksi dalam dokumentasi atau Git.
 
 ## Pengujian dan pemeriksaan
 
@@ -59,6 +71,7 @@ Semua endpoint mengirim dan menerima JSON di bawah `/api/v1`.
 | Perangkat daerah | `GET/POST /api/v1/perangkat-daerah`, `GET/PATCH/DELETE /api/v1/perangkat-daerah/:id` |
 | Pegawai | `GET/POST /api/v1/pegawai`, `GET/PATCH/DELETE /api/v1/pegawai/:id` |
 | Kendaraan | `GET/POST /api/v1/kendaraan`, `GET/PATCH/DELETE /api/v1/kendaraan/:id` |
+| Riwayat perawatan | `GET/POST /api/v1/perawatan`, `GET/PATCH/DELETE /api/v1/perawatan/:id` |
 
 Contoh payload pembuatan kendaraan:
 
@@ -78,6 +91,8 @@ Contoh payload pembuatan kendaraan:
 ```
 
 Validasi yang gagal mengembalikan HTTP `422` beserta objek `errors`; data tidak ditemukan mengembalikan HTTP `404`.
+
+Panduan seluruh perintah CRUD `curl`, filter, pagination, dan header API key production tersedia di [docs/API.md](docs/API.md).
 
 ## Penggunaan AI
 
@@ -108,5 +123,6 @@ Contoh prompt:
 
 - Filter dan pagination tersedia pada seluruh daftar web serta endpoint collection API.
 - Dasbor menampilkan status, distribusi kendaraan per perangkat daerah, dan biaya perawatan per bulan.
-- Halaman detail kendaraan menampilkan riwayat serta total biaya perawatan dan menyediakan aksi cepat untuk mencatat perawatan.
+- Fitur bisnis tambahan mencatat riwayat perawatan, menghitung total biaya per kendaraan, total biaya keseluruhan, dan menampilkan tren biaya pada dasbor.
+- Seluruh halaman termasuk formulir, tabel, navigasi, dasbor, dan halaman masuk dirancang responsif untuk desktop, tablet, dan ponsel.
 - Lihat [ERD](docs/ERD.md), [evaluasi implementasi](docs/EVALUASI.md), dan [manual setup](docs/MANUAL_SETUP.md) untuk bukti desain dan verifikasi.

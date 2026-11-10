@@ -13,6 +13,14 @@ bin/rails server
 
 Buka `http://localhost:3000`. Seed bersifat idempoten dan memuat tiga perangkat daerah, sembilan pegawai fiktif, sebelas kendaraan, dan dua belas riwayat perawatan lintas bulan sehingga grafik dasbor terisi.
 
+Gunakan akun demonstrasi berikut untuk masuk:
+
+| Email | Kata sandi |
+| --- | --- |
+| `admin@kdo.test` | `KDO-Demo-2026!` |
+
+Kredensial tersebut hanya untuk lingkungan lokal/demonstrasi. Sebelum production, buat akun baru dengan kata sandi yang kuat dan jangan menyimpan kredensial production dalam Git atau dokumentasi.
+
 ## 2. Alur demonstrasi
 
 1. Buka **Dasbor** untuk melihat total aset dan ringkasan tiga kondisi kendaraan.
@@ -20,7 +28,8 @@ Buka `http://localhost:3000`. Seed bersifat idempoten dan memuat tiga perangkat 
 3. Buka **Pegawai** dan masukkan PNS dengan NIP 18 digit.
 4. Buka **Kendaraan** dan tetapkan pegawai penanggung jawab dari perangkat daerah yang sama.
 5. Buka **Perawatan** untuk mencatat pekerjaan, tanggal, uraian, dan biaya.
-6. Coba hapus pegawai atau perangkat daerah yang masih dipakai; aplikasi menolak tindakan tersebut untuk menjaga integritas data.
+6. Periksa dasbor untuk melihat total biaya perawatan, tren biaya per bulan, dan kendaraan yang perlu ditindaklanjuti.
+7. Coba hapus pegawai atau perangkat daerah yang masih dipakai; aplikasi menolak tindakan tersebut untuk menjaga integritas data.
 
 ## 3. Status kendaraan
 
@@ -53,3 +62,5 @@ Gunakan `bin/rails db:seed` untuk aplikasi Rails; dump disediakan sebagai artefa
 ## 6. Konfigurasi production API
 
 Di production, semua endpoint `/api/v1` memerlukan header `X-API-Key`. Tetapkan `KDO_API_KEY` melalui secret manager atau environment deployment Anda. Jangan menyimpan nilainya di Git, README, atau prompt AI.
+
+Contoh lengkap `curl` untuk seluruh operasi CRUD, filter, dan pagination tersedia pada [API.md](API.md).

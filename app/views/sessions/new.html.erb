@@ -1,0 +1,20 @@
+<% content_for :title, "Masuk | KDO" %>
+
+<section class="auth-shell">
+  <div class="auth-intro">
+    <p class="dashboard-kicker">Kendaraan Dinas Operasional</p>
+    <h1>Kelola armada dengan lebih terarah.</h1>
+    <p>Masuk untuk memantau kondisi kendaraan, penanggung jawab, dan biaya perawatan dari satu dasbor.</p>
+  </div>
+
+  <section class="form-card auth-card" aria-labelledby="login-title">
+    <p class="auth-card__eyebrow">Akses pengguna</p>
+    <h1 id="login-title">Masuk ke KDO</h1>
+    <p class="auth-card__description">Gunakan akun yang sudah terdaftar untuk melanjutkan.</p>
+    <%= form_with url: session_path, class: "auth-form" do |form| %>
+      <div class="field"><%= form.label :email_address, "Email" %><%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "email", placeholder: "nama@instansi.go.id" %></div>
+      <div class="field"><%= form.label :password, "Kata sandi" %><%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Masukkan kata sandi" %></div>
+      <%= form.submit "Masuk", class: "button auth-form__submit" %>
+    <% end %>
+  </section>
+</section>
