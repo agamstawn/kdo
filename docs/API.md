@@ -1,20 +1,22 @@
 # Dokumentasi REST API KDO
 
-Base URL lokal: `http://localhost:3000/api/v1`. Semua request dan respons memakai JSON.
+Base URL lokal: `http://localhost:3000/api/v1`. Semua request dan respons memakai JSON. API dipisahkan dari sesi browser agar dapat diuji dari terminal atau diintegrasikan oleh klien lain.
 
 ## Keamanan dan error
 
 - API tidak menggunakan sesi login pengguna. Pada development dan test, API dapat dipakai langsung agar mudah diuji dari terminal kedua.
 - Pada production, seluruh endpoint API mewajibkan header `X-API-Key` yang nilainya sama dengan environment variable `KDO_API_KEY`.
 - Simpan API key production di secret manager atau environment deployment; jangan memasukkannya ke Git, dokumentasi, atau prompt AI.
-- `401` menandakan API key tidak valid, `404` data tidak ditemukan, dan `422` validasi gagal.
+- `401` menandakan API key tidak valid, `404` data tidak ditemukan, `422` validasi gagal atau penghapusan ditolak oleh relasi aktif, dan `503` berarti API key production belum dikonfigurasi.
 - Respons validasi memakai bentuk `{ "errors": { "field": ["pesan"] } }`.
 
 Untuk production, tambahkan `-H "X-API-Key: $KDO_API_KEY"` pada setiap perintah `curl` di bawah. Contoh pengaturan lokal yang aman:
 
 ```bash
-export KDO_API_KEY='nilai-key-dari-secret-manager'
+export KDO_API_KEY='ambil-dari-secret-manager'
 ```
+
+Jangan menjalankan contoh `export` tersebut dengan nilai rahasia asli pada shell yang direkam, dibagikan, atau disimpan ke riwayat.
 
 ## Endpoint
 
@@ -25,6 +27,8 @@ export KDO_API_KEY='nilai-key-dari-secret-manager'
 | Kendaraan dinas | `GET`, `POST /kendaraan` | `GET`, `PATCH`, `DELETE /kendaraan/:id` |
 | Riwayat perawatan | `GET`, `POST /perawatan` | `GET`, `PATCH`, `DELETE /perawatan/:id` |
 
+Status keberhasilan: `200 OK` untuk `GET`/`PATCH`, `201 Created` untuk `POST`, dan `204 No Content` untuk `DELETE`. Operasi yang mengirim body (`POST`/`PATCH`) harus memakai header `Content-Type: application/json` dan root JSON sesuai nama resource.
+
 ## Filter dan pagination collection
 
 Semua endpoint collection menerima `page` dan `per_page` (maksimum 50), lalu mengembalikan metadata berikut:
@@ -33,11 +37,29 @@ Semua endpoint collection menerima `page` dan `per_page` (maksimum 50), lalu men
 { "data": [], "meta": { "page": 1, "per_page": 10, "total_count": 0, "total_pages": 1 } }
 ```
 
-Filter yang tersedia: `q` untuk semua collection; `perangkat_daerah_id` untuk pegawai/kendaraan; `status` untuk kendaraan; dan `kendaraan_dinas_id` untuk riwayat perawatan.
+| Resource | Filter |
+| --- | --- |
+| Semua collection | `q` (pencarian teks), `page`, `per_page` |
+| Pegawai | `perangkat_daerah_id` |
+| Kendaraan | `perangkat_daerah_id`, `status` (`baik`, `rusak_ringan`, `rusak_berat`) |
+| Perawatan | `kendaraan_dinas_id` |
+
+Nilai `per_page` dibatasi maksimal 50. Nilai halaman yang kurang dari 1 dinormalisasi menjadi 1.
+
+## Bentuk payload
+
+| Resource | Root JSON | Atribut yang diterima |
+| --- | --- | --- |
+| Perangkat daerah | `perangkat_daerah` | `nama` |
+| Pegawai | `pegawai` | `nama`, `nip`, `jabatan`, `golongan`, `perangkat_daerah_id` |
+| Kendaraan | `kendaraan_dinas` | `nomor_polisi`, `merek`, `model`, `tahun_produksi`, `warna`, `status`, `perangkat_daerah_id`, `penanggung_jawab_id` |
+| Perawatan | `riwayat_perawatan` | `kendaraan_dinas_id`, `tanggal`, `jenis`, `keterangan`, `biaya` |
+
+Respons collection berbentuk `{ "data": [...], "meta": { ... } }`; respons member berbentuk objek resource. Respons `422` berbentuk `{ "errors": { "field": ["pesan"] } }` dan `404` berbentuk `{ "error": "Data tidak ditemukan" }`.
 
 ## Uji manual dengan curl
 
-Jalankan server pada terminal pertama dengan `bin/rails server`, lalu jalankan perintah berikut pada terminal kedua. Contoh memakai ID data seed `1`; ganti variabel ID sesuai respons API atau data lokal Anda.
+Jalankan server pada terminal pertama dengan `bin/rails server`, lalu jalankan perintah berikut pada terminal kedua. Contoh memakai ID data seed `1`; ganti variabel ID sesuai respons API atau data lokal Anda. Untuk aman, buat data melalui `POST`, simpan ID responsnya, lalu gunakan hanya data tersebut untuk contoh `PATCH` dan `DELETE`.
 
 ```bash
 export API_BASE='http://localhost:3000/api/v1'
@@ -60,7 +82,7 @@ curl -sS -X POST "$API_BASE/perangkat-daerah" -H 'Content-Type: application/json
 # GET member
 curl -sS "$API_BASE/perangkat-daerah/$PERANGKAT_ID"
 
-# PATCH
+# PATCH — gunakan ID data uji, bukan data seed yang ingin dipertahankan
 curl -sS -X PATCH "$API_BASE/perangkat-daerah/$PERANGKAT_ID" -H 'Content-Type: application/json' \
   -d '{"perangkat_daerah":{"nama":"Dinas Pendidikan Kabupaten"}}'
 
@@ -81,7 +103,7 @@ curl -sS -X POST "$API_BASE/pegawai" -H 'Content-Type: application/json' \
 # GET member
 curl -sS "$API_BASE/pegawai/$PEGAWAI_ID"
 
-# PATCH
+# PATCH — gunakan ID data uji, bukan data seed yang ingin dipertahankan
 curl -sS -X PATCH "$API_BASE/pegawai/$PEGAWAI_ID" -H 'Content-Type: application/json' \
   -d '{"pegawai":{"jabatan":"Analis Data Senior"}}'
 
@@ -104,7 +126,7 @@ curl -sS -X POST "$API_BASE/kendaraan" -H 'Content-Type: application/json' \
 # GET member
 curl -sS "$API_BASE/kendaraan/$KENDARAAN_ID"
 
-# PATCH
+# PATCH — gunakan ID data uji, bukan data seed yang ingin dipertahankan
 curl -sS -X PATCH "$API_BASE/kendaraan/$KENDARAAN_ID" -H 'Content-Type: application/json' \
   -d '{"kendaraan_dinas":{"status":"rusak_ringan","warna":"Abu-abu"}}'
 
@@ -127,7 +149,7 @@ curl -sS -X POST "$API_BASE/perawatan" -H 'Content-Type: application/json' \
 # GET member
 curl -sS "$API_BASE/perawatan/$PERAWATAN_ID"
 
-# PATCH
+# PATCH — gunakan ID data uji, bukan data seed yang ingin dipertahankan
 curl -sS -X PATCH "$API_BASE/perawatan/$PERAWATAN_ID" -H 'Content-Type: application/json' \
   -d '{"riwayat_perawatan":{"biaya":1350000,"keterangan":"Penggantian oli, pemeriksaan rem, dan rotasi ban."}}'
 
@@ -135,4 +157,4 @@ curl -sS -X PATCH "$API_BASE/perawatan/$PERAWATAN_ID" -H 'Content-Type: applicat
 curl -sS -i -X DELETE "$API_BASE/perawatan/$PERAWATAN_ID"
 ```
 
-Untuk mencoba perintah `POST` berulang kali, ganti nilai yang harus unik seperti `nama`, `nip`, atau `nomor_polisi`.
+Untuk mencoba perintah `POST` berulang kali, ganti nilai yang harus unik seperti `nama`, `nip`, atau `nomor_polisi`. Perintah `DELETE` untuk perangkat daerah, pegawai, atau kendaraan dapat mengembalikan `422` bila data tersebut masih direferensikan; ini merupakan perilaku integritas yang diharapkan.

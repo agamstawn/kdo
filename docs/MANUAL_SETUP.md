@@ -1,8 +1,24 @@
 # Manual Setup dan Demonstrasi KDO
 
-## 1. Instalasi lokal
+Dokumen ini memandu instalasi lokal, penggunaan akun demonstrasi, alur uji fitur, dan verifikasi aplikasi KDO.
 
-Pastikan Ruby 3.2.0 dan SQLite 3 tersedia, kemudian jalankan dari akar proyek:
+## 1. Prasyarat
+
+- Ruby `3.2.0`
+- Bundler
+- SQLite 3
+
+Jalankan seluruh perintah dari akar proyek.
+
+```bash
+ruby -v
+bundle -v
+sqlite3 --version
+```
+
+Versi Ruby harus diawali `3.2.0`.
+
+## 2. Instalasi dan inisialisasi database
 
 ```bash
 bundle install
@@ -11,56 +27,103 @@ bin/rails db:seed
 bin/rails server
 ```
 
-Buka `http://localhost:3000`. Seed bersifat idempoten dan memuat tiga perangkat daerah, sembilan pegawai fiktif, sebelas kendaraan, dan dua belas riwayat perawatan lintas bulan sehingga grafik dasbor terisi.
+Buka `http://localhost:3000`. Pengunjung akan diarahkan ke halaman masuk bila belum mempunyai sesi.
 
-Gunakan akun demonstrasi berikut untuk masuk:
+`db:prepare` membuat/memigrasikan database bila diperlukan. `db:seed` aman dijalankan berulang untuk data contoh yang sama. Jangan menjalankan `bin/rails db:reset` kecuali Anda memang mengizinkan penghapusan seluruh data development lokal.
+
+## 3. Akun demonstrasi
 
 | Email | Kata sandi |
 | --- | --- |
 | `admin@kdo.test` | `KDO-Demo-2026!` |
 
-Kredensial tersebut hanya untuk lingkungan lokal/demonstrasi. Sebelum production, buat akun baru dengan kata sandi yang kuat dan jangan menyimpan kredensial production dalam Git atau dokumentasi.
+Kredensial ini merupakan data demo lokal yang dibuat oleh `db:seed`; bukan akun production. Sebelum deployment, buat pengguna baru dengan kata sandi kuat dan kelola rahasia di secret manager/environment deployment. Jangan menyimpan kredensial production pada repository, screenshot, atau prompt AI.
 
-## 2. Alur demonstrasi
+## 4. Data yang disediakan seed
 
-1. Buka **Dasbor** untuk melihat total aset dan ringkasan tiga kondisi kendaraan.
-2. Buka **Perangkat Daerah**, lalu buat atau ubah unit kerja.
-3. Buka **Pegawai** dan masukkan PNS dengan NIP 18 digit.
-4. Buka **Kendaraan** dan tetapkan pegawai penanggung jawab dari perangkat daerah yang sama.
-5. Buka **Perawatan** untuk mencatat pekerjaan, tanggal, uraian, dan biaya.
-6. Periksa dasbor untuk melihat total biaya perawatan, tren biaya per bulan, dan kendaraan yang perlu ditindaklanjuti.
-7. Coba hapus pegawai atau perangkat daerah yang masih dipakai; aplikasi menolak tindakan tersebut untuk menjaga integritas data.
+Seed memasukkan data fiktif berikut untuk demonstrasi yang lebih variatif:
 
-## 3. Status kendaraan
+| Data | Jumlah | Kegunaan |
+| --- | ---: | --- |
+| Perangkat daerah | 3 | Dinas Pendidikan, Dinas Kesehatan, Dinas PUPR |
+| Pegawai | 9 | Penanggung jawab kendaraan |
+| Kendaraan | 11 | Status baik, rusak ringan, dan rusak berat |
+| Riwayat perawatan | 12 | Tren biaya dari Mei–November 2026 |
+| Pengguna | 1 | Akun masuk demonstrasi |
 
-Status yang valid hanya:
+Data tersebut tidak boleh diperlakukan sebagai data operasional nyata.
 
-- `baik`
-- `rusak_ringan`
-- `rusak_berat`
+## 5. Alur demonstrasi aplikasi
 
-Status lama `tidak_aktif`, jika ada pada database lama, dinormalisasi menjadi `rusak_berat` melalui migrasi `20261110050000`.
+1. Masuk melalui `/sesi/new`.
+2. Buka **Dasbor** dan periksa total armada, kartu kondisi, total biaya, komposisi kondisi, grafik biaya, serta daftar prioritas tindak lanjut.
+3. Buka **Perangkat Daerah**, tambah atau ubah unit kerja, lalu buka **Detail** untuk melihat pegawai serta kendaraan milik unit tersebut.
+4. Buka **Pegawai**, masukkan nama, NIP 18 digit, jabatan, golongan, dan perangkat daerah.
+5. Buka **Kendaraan**, masukkan identitas kendaraan, pilih status, perangkat daerah, dan pegawai penanggung jawab yang berada pada unit sama.
+6. Buka **Perawatan**, catat tanggal, jenis pekerjaan, uraian, dan biaya. Setelah disimpan, biaya tersebut ikut dihitung pada detail kendaraan dan dasbor.
+7. Pada halaman daftar, coba pencarian/filter dan pindah halaman menggunakan pagination.
+8. Pada setiap halaman detail, gunakan tombol **Kembali ke ...** untuk kembali ke daftar entitas yang sedang dibuka.
+9. Coba menghapus perangkat daerah, pegawai, atau kendaraan yang masih punya relasi aktif. Aplikasi harus menolak tindakan tersebut dan menampilkan kesalahan yang dapat dipahami.
+10. Keluar melalui tombol **Keluar** di navigasi.
 
-## 4. Pengujian
+## 6. Aturan dan validasi yang perlu diuji
+
+| Aturan | Hasil yang diharapkan |
+| --- | --- |
+| NIP tidak terdiri dari 18 digit | Form/API menolak dengan kesalahan validasi |
+| Nomor polisi atau nama perangkat daerah duplikat | Form/API menolak karena harus unik |
+| Status selain `baik`, `rusak_ringan`, `rusak_berat` | Form/API menolak nilai tidak valid |
+| Penanggung jawab dari perangkat daerah lain | Form/API menolak relasi tidak sesuai |
+| Biaya perawatan negatif | Form/API menolak nilai negatif |
+| Hapus data yang masih direferensikan | Aplikasi menolak untuk menjaga integritas |
+
+## 7. Verifikasi otomatis
 
 ```bash
 bin/rails test
-bin/rails db:migrate:status
 bin/rails routes
+bin/rails db:migrate:status
 ```
 
-## 5. Dump database demonstrasi
+Pengujian meliputi aturan relasi dan validasi model, autentikasi sesi, aksi detail halaman web, serta CRUD REST API dan respons kesalahan.
 
-Dump tanpa data personal berada pada `db/dumps/kdo_sample.sql`. Untuk memuatnya pada SQLite kosong:
+## 8. Uji REST API dari terminal kedua
+
+Biarkan `bin/rails server` berjalan pada terminal pertama. Buka terminal kedua untuk menguji endpoint API dengan `curl`.
+
+```bash
+export API_BASE='http://localhost:3000/api/v1'
+curl -sS "$API_BASE/kendaraan?page=1&per_page=10"
+```
+
+Seluruh perintah `GET`, `POST`, `PATCH`, dan `DELETE` untuk keempat resource, termasuk filter dan pagination, tersedia di [API.md](API.md). Di development/test API tidak meminta sesi browser. Pada production, tambahkan header `X-API-Key` pada setiap request dan simpan nilainya di secret manager.
+
+## 9. Dump SQLite demonstrasi
+
+Artefak dump tersedia pada `db/dumps/kdo_sample.sql`. Untuk memeriksa dump tanpa menimpa database aplikasi, impor ke file sementara:
 
 ```bash
 sqlite3 /tmp/kdo_sample.sqlite3 < db/dumps/kdo_sample.sql
+sqlite3 /tmp/kdo_sample.sqlite3 '.tables'
 ```
 
-Gunakan `bin/rails db:seed` untuk aplikasi Rails; dump disediakan sebagai artefak penilaian dan contoh struktur RDBMS.
+Gunakan `db:prepare` dan `db:seed` sebagai cara utama menyiapkan database aplikasi saat ini. Dump disediakan sebagai artefak RDBMS demonstrasi; seluruh data di dalamnya harus diperlakukan sebagai contoh fiktif.
 
-## 6. Konfigurasi production API
+## 10. Konfigurasi API production
 
-Di production, semua endpoint `/api/v1` memerlukan header `X-API-Key`. Tetapkan `KDO_API_KEY` melalui secret manager atau environment deployment Anda. Jangan menyimpan nilainya di Git, README, atau prompt AI.
+Semua endpoint `/api/v1` di production memerlukan `X-API-Key` yang dibandingkan dengan environment variable `KDO_API_KEY`. Aplikasi mengembalikan `503` bila variabel tersebut belum dikonfigurasi dan `401` bila kunci salah.
 
-Contoh lengkap `curl` untuk seluruh operasi CRUD, filter, dan pagination tersedia pada [API.md](API.md).
+Tetapkan nilai melalui secret manager/deployment environment. Jangan memasukkan nilai kunci production dalam Git, dokumentasi, file seed, atau terminal yang direkam.
+
+## 11. Bukti tampilan dan troubleshooting
+
+Lihat [SCREENSHOTS.md](SCREENSHOTS.md) untuk bukti halaman masuk dan dasbor.
+
+| Gejala | Pemeriksaan awal |
+| --- | --- |
+| Server tidak dapat dijalankan | Pastikan `bundle install` berhasil dan Ruby yang dipakai adalah 3.2.0 |
+| Tabel belum tersedia | Jalankan `bin/rails db:prepare` |
+| Tidak dapat masuk | Jalankan `bin/rails db:seed`, lalu gunakan akun demo yang tercantum di atas |
+| Dasbor kosong | Jalankan kembali `bin/rails db:seed` dan muat ulang halaman |
+| API production memberi `401` | Pastikan header `X-API-Key` cocok dengan secret `KDO_API_KEY` deployment |
+

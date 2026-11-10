@@ -1,25 +1,31 @@
 # KDO — Kendaraan Dinas Operasional
 
-Aplikasi full-stack Ruby on Rails untuk pendataan kendaraan dinas, kondisi kendaraan, perangkat daerah pemilik, dan PNS yang bertanggung jawab atas penggunaannya.
+KDO adalah aplikasi full-stack Ruby on Rails untuk mendata kendaraan dinas operasional, perangkat daerah pemilik aset, pegawai penanggung jawab, dan riwayat perawatannya. Aplikasi membantu operator mengetahui kondisi armada, penanggung jawab, serta biaya perawatan secara terpusat.
 
-## Fitur
+## Fitur utama
 
-- Dasbor ringkas jumlah kendaraan, pegawai, dan perangkat daerah.
-- CRUD kendaraan dinas: nomor polisi, merek, tipe/model, tahun produksi, warna, dan status kondisi.
-- CRUD PNS: nama, NIP, jabatan, golongan, dan perangkat daerah.
-- CRUD perangkat daerah, termasuk data awal Dinas Pendidikan, Dinas Kesehatan, dan Dinas PUPR.
-- Validasi NIP (18 digit), nomor polisi unik, dan keterkaitan penanggung jawab dengan perangkat daerah kendaraan.
-- Autentikasi sesi pengguna untuk seluruh halaman web, disertai pembatasan percobaan masuk dasar.
-- REST API versi 1 dengan API key sebagai perlindungan dasar pada production, serta halaman web responsif pada desktop, tablet, dan ponsel.
-- Fitur bisnis tambahan: catat riwayat perawatan, total biaya per kendaraan, total biaya pada dasbor, dan tren biaya perawatan per bulan.
+- Autentikasi sesi untuk seluruh halaman web, termasuk pembatasan percobaan masuk dasar.
+- CRUD lengkap untuk **Perangkat Daerah**, **Pegawai**, **Kendaraan Dinas**, dan **Riwayat Perawatan**.
+- Halaman daftar, form, detail, ubah, dan hapus pada tiap entitas.
+- Filter pencarian dan pagination pada seluruh daftar web maupun collection REST API.
+- Validasi NIP 18 digit, nomor polisi unik, status kendaraan, dan kesesuaian perangkat daerah antara kendaraan dengan penanggung jawabnya.
+- Dasbor responsif dengan ringkasan armada, komposisi kondisi, tren biaya enam bulan, kendaraan prioritas, distribusi armada per perangkat daerah, dan riwayat perawatan terbaru.
+- Fitur bisnis tambahan: pencatatan perawatan, biaya setiap perawatan, total biaya per kendaraan, dan total biaya pada dasbor.
+- REST API versi 1 dengan error handling JSON dan perlindungan `X-API-Key` ketika aplikasi berjalan di production.
 
-## Prasyarat
+## Teknologi
 
-- Ruby `3.2.0`
-- Bundler
-- SQLite 3
+| Komponen | Pilihan |
+| --- | --- |
+| Bahasa | Ruby 3.2.0 |
+| Framework | Rails 8.1 |
+| Database | SQLite 3 |
+| Antarmuka | Rails server-rendered, CSS responsif |
+| API | REST JSON di `/api/v1` |
 
-## Menjalankan aplikasi
+## Menjalankan aplikasi secara lokal
+
+Prasyarat: Ruby `3.2.0`, Bundler, dan SQLite 3.
 
 ```bash
 bundle install
@@ -28,101 +34,108 @@ bin/rails db:seed
 bin/rails server
 ```
 
-Buka `http://localhost:3000` di peramban.
+Buka `http://localhost:3000`, lalu masuk melalui `http://localhost:3000/sesi/new`.
 
-## Akun demonstrasi
-
-Setelah menjalankan `bin/rails db:seed`, gunakan akun berikut untuk masuk:
+### Akun demonstrasi
 
 | Email | Kata sandi |
 | --- | --- |
 | `admin@kdo.test` | `KDO-Demo-2026!` |
 
-Kredensial ini hanya untuk demonstrasi lokal. Ganti atau buat akun baru sebelum deployment, dan jangan gunakan kata sandi produksi dalam dokumentasi atau Git.
+Akun tersebut dibuat oleh seed dan hanya berlaku untuk demonstrasi lokal. Jangan gunakan kredensial ini di deployment. Buat akun baru dan simpan rahasia production di secret manager atau environment deployment, bukan di Git, dokumentasi, atau prompt AI.
 
-## Pengujian dan pemeriksaan
+## Cara menggunakan aplikasi
+
+1. Masuk menggunakan akun demonstrasi.
+2. Kelola **Perangkat Daerah** sebagai unit pemilik aset.
+3. Tambahkan **Pegawai** dengan NIP 18 digit dan perangkat daerahnya.
+4. Tambahkan **Kendaraan** dan pilih pegawai penanggung jawab dari perangkat daerah yang sama.
+5. Catat pekerjaan pada menu **Perawatan** untuk menyimpan tanggal, jenis pekerjaan, uraian, dan biaya.
+6. Gunakan dasbor untuk melihat kondisi armada, biaya, kendaraan yang perlu perhatian, serta tren perawatan.
+
+Setiap daftar memiliki aksi **Detail**, **Ubah**, dan **Hapus** yang sejajar. Halaman detail menyediakan tombol kembali ke daftar asal. Detail perangkat daerah juga menampilkan pegawai terkait serta nomor polisi dan nama kendaraan terkait.
+
+## Aturan data penting
+
+- Status kendaraan hanya `baik`, `rusak_ringan`, atau `rusak_berat`.
+- Nama perangkat daerah, NIP, dan nomor polisi harus unik.
+- Kendaraan harus memiliki perangkat daerah dan penanggung jawab.
+- Penanggung jawab kendaraan wajib berasal dari perangkat daerah yang sama.
+- Data perangkat daerah, pegawai, atau kendaraan yang masih direferensikan tidak dapat dihapus.
+- Biaya perawatan bersifat opsional, tetapi bila diisi harus bernilai nol atau lebih.
+
+## URL aplikasi web
+
+| Halaman | URL |
+| --- | --- |
+| Dasbor | `/` |
+| Masuk/keluar | `/sesi/new`, `POST/DELETE /sesi` |
+| Perangkat daerah | `/perangkat-daerah` |
+| Pegawai | `/pegawai` |
+| Kendaraan | `/kendaraan` |
+| Perawatan | `/perawatan` |
+
+Nama URL sengaja memakai bentuk sederhana dan mudah dibaca. Nama model Rails tetap mempertahankan istilah domain Indonesia, sehingga perubahan URL tidak memerlukan perubahan skema maupun kontrak data.
+
+## REST API
+
+Base URL lokal: `http://localhost:3000/api/v1`.
+
+| Resource | Collection | Member |
+| --- | --- | --- |
+| Perangkat daerah | `GET`, `POST /perangkat-daerah` | `GET`, `PATCH`, `DELETE /perangkat-daerah/:id` |
+| Pegawai | `GET`, `POST /pegawai` | `GET`, `PATCH`, `DELETE /pegawai/:id` |
+| Kendaraan | `GET`, `POST /kendaraan` | `GET`, `PATCH`, `DELETE /kendaraan/:id` |
+| Perawatan | `GET`, `POST /perawatan` | `GET`, `PATCH`, `DELETE /perawatan/:id` |
+
+Endpoint collection mendukung `page`, `per_page`, dan filter yang relevan. Di development/test API dapat diuji langsung; di production semua endpoint API wajib menyertakan header `X-API-Key` yang cocok dengan `KDO_API_KEY`.
+
+Lihat [kontrak API dan seluruh perintah curl](docs/API.md) untuk payload, filter, pagination, kode respons, dan contoh pengujian terminal.
+
+## Pengujian
 
 ```bash
 bin/rails test
 bin/rails routes
+bin/rails db:migrate:status
+```
+
+Test mencakup validasi model dan relasi, autentikasi sesi, halaman detail, serta lifecycle REST API create/read/update/delete dan error validasi. Untuk membuat ulang data development, gunakan berikut **hanya jika data lokal memang boleh dihapus**:
+
+```bash
 bin/rails db:reset db:seed
 ```
 
-Seed demonstrasi bersifat idempoten dan menyediakan variasi data kendaraan, kondisi, serta biaya perawatan lintas enam bulan untuk memvisualisasikan dasbor. Seluruh data seed adalah fiktif dan bukan untuk penggunaan produksi.
+Seed bersifat idempoten dan menyediakan 3 perangkat daerah, 9 pegawai, 11 kendaraan, serta 12 riwayat perawatan fiktif lintas enam bulan agar dasbor tidak menampilkan data monoton.
 
-`db:reset` menghapus database development lokal, jadi gunakan hanya saat memang ingin membuat data ulang.
+## Dokumentasi proyek
 
-## Model data
+- [Manual setup dan alur demonstrasi](docs/MANUAL_SETUP.md)
+- [Kontrak REST API dan curl](docs/API.md)
+- [ERD dan aturan integritas](docs/ERD.md)
+- [Evaluasi implementasi berdasarkan komponen penilaian](docs/EVALUASI.md)
+- [Bukti tampilan aplikasi](docs/SCREENSHOTS.md)
+- [Instruksi AI pengembangan](AGENTS.md)
+- `db/dumps/kdo_sample.sql`: artefak dump SQLite demonstrasi.
 
-| Entitas | Atribut utama | Relasi |
-| --- | --- | --- |
-| Perangkat Daerah | nama | Memiliki banyak pegawai dan kendaraan |
-| Pegawai | nama, NIP, jabatan, golongan | Milik satu perangkat daerah; dapat menjadi penanggung jawab kendaraan |
-| Kendaraan Dinas | nomor polisi, merek, model, tahun produksi, warna, status | Milik satu perangkat daerah dan satu pegawai penanggung jawab |
+## Bukti tampilan
 
-Status kendaraan yang didukung: `baik`, `rusak_ringan`, dan `rusak_berat`.
+![Dasbor KDO](docs/screenshots/fullstack/fe-dashboard.png)
 
-## REST API
-
-Semua endpoint mengirim dan menerima JSON di bawah `/api/v1`.
-
-| Resource | Endpoint |
-| --- | --- |
-| Perangkat daerah | `GET/POST /api/v1/perangkat-daerah`, `GET/PATCH/DELETE /api/v1/perangkat-daerah/:id` |
-| Pegawai | `GET/POST /api/v1/pegawai`, `GET/PATCH/DELETE /api/v1/pegawai/:id` |
-| Kendaraan | `GET/POST /api/v1/kendaraan`, `GET/PATCH/DELETE /api/v1/kendaraan/:id` |
-| Riwayat perawatan | `GET/POST /api/v1/perawatan`, `GET/PATCH/DELETE /api/v1/perawatan/:id` |
-
-Contoh payload pembuatan kendaraan:
-
-```json
-{
-  "kendaraan_dinas": {
-    "nomor_polisi": "B 1234 KDO",
-    "merek": "Toyota",
-    "model": "Innova",
-    "tahun_produksi": 2022,
-    "warna": "Hitam",
-    "status": "baik",
-    "perangkat_daerah_id": 1,
-    "penanggung_jawab_id": 1
-  }
-}
-```
-
-Validasi yang gagal mengembalikan HTTP `422` beserta objek `errors`; data tidak ditemukan mengembalikan HTTP `404`.
-
-Panduan seluruh perintah CRUD `curl`, filter, pagination, dan header API key production tersedia di [docs/API.md](docs/API.md).
+Tangkapan lengkap, termasuk halaman masuk dan bagian lanjutan dasbor, tersedia pada [docs/SCREENSHOTS.md](docs/SCREENSHOTS.md). Semua data pada gambar adalah data demonstrasi fiktif.
 
 ## Penggunaan AI
 
-Proyek ini dapat dikembangkan dengan **Codex menggunakan model GPT Terra** sebagai asisten implementasi.
+Proyek ini dapat dikembangkan dengan **Codex menggunakan model GPT Terra** sebagai asisten implementasi. Sebelum meminta perubahan, baca `AGENTS.md` dan dokumentasi terkait.
 
-1. Baca `AGENTS.md` dan `README.md` sebelum mengubah kode.
-2. Berikan tugas yang spesifik, misalnya: “Tambahkan riwayat perawatan kendaraan, lengkap dengan migrasi, endpoint API, antarmuka, dan test.”
-3. Minta AI menjelaskan asumsi yang mengubah aturan bisnis atau relasi data.
-4. Jalankan test dan pemeriksaan database setelah perubahan. Tinjau diff sebelum melakukan commit.
-5. Jangan memasukkan NIP produksi, kata sandi, token, atau kredensial ke prompt. Gunakan data contoh atau variabel lingkungan.
+Contoh prompt yang aman:
 
-Contoh prompt:
+> Tambahkan filter status pada daftar kendaraan KDO. Pertahankan endpoint REST yang ada, perbarui test dan dokumentasi API, jalankan seluruh test suite, lalu tampilkan ringkasan perubahan.
 
-> Tambahkan filter status dan perangkat daerah pada daftar kendaraan KDO. Pertahankan endpoint REST yang ada, tambahkan test, dan jalankan seluruh test suite.
+Saat menggunakan AI:
 
-## Struktur penting
+1. Berikan tugas dan kriteria penerimaan yang spesifik.
+2. Minta AI menjelaskan asumsi yang mengubah aturan bisnis, relasi, atau data.
+3. Jalankan test, tinjau perubahan database, dan periksa diff sebelum commit.
+4. Jangan memasukkan NIP nyata, kata sandi production, token, API key, atau data pribadi ke prompt.
 
-- `app/models`: relasi dan validasi domain.
-- `app/controllers`: pengendali halaman web dan API REST.
-- `app/views`: antarmuka CRUD server-rendered.
-- `db/migrate`: struktur SQLite dan constraint data.
-- `AGENTS.md`: instruksi untuk asisten AI yang mengerjakan proyek.
-- `docs/MANUAL_SETUP.md`: panduan instalasi dan demonstrasi aplikasi.
-- `docs/API.md`: kontrak endpoint REST API.
-- `db/dumps/kdo_sample.sql`: dump SQLite data demonstrasi fiktif.
-
-## Peningkatan untuk penilaian
-
-- Filter dan pagination tersedia pada seluruh daftar web serta endpoint collection API.
-- Dasbor menampilkan status, distribusi kendaraan per perangkat daerah, dan biaya perawatan per bulan.
-- Fitur bisnis tambahan mencatat riwayat perawatan, menghitung total biaya per kendaraan, total biaya keseluruhan, dan menampilkan tren biaya pada dasbor.
-- Seluruh halaman termasuk formulir, tabel, navigasi, dasbor, dan halaman masuk dirancang responsif untuk desktop, tablet, dan ponsel.
-- Lihat [ERD](docs/ERD.md), [evaluasi implementasi](docs/EVALUASI.md), dan [manual setup](docs/MANUAL_SETUP.md) untuk bukti desain dan verifikasi.
