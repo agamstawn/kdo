@@ -1,7 +1,108 @@
 <% content_for :title, "Dasbor KDO" %>
-<section class="page-heading"><div><h1>Dasbor</h1><p>Ringkasan data Kendaraan Dinas Operasional.</p></div><%= link_to "+ Tambah kendaraan", new_kendaraan_dinas_path, class: "button" %></section>
-<section class="cards"><div class="card"><p>Total kendaraan</p><strong><%= @total_kendaraan %></strong></div><div class="card"><p>Pegawai terdaftar</p><strong><%= @total_pegawai %></strong></div><div class="card"><p>Perangkat daerah</p><strong><%= @total_perangkat_daerah %></strong></div></section>
-<section class="status-summary"><div><span>Baik</span><strong><%= @status_counts.fetch("baik", 0) %></strong></div><div><span>Rusak Ringan</span><strong><%= @status_counts.fetch("rusak_ringan", 0) %></strong></div><div><span>Rusak Berat</span><strong><%= @status_counts.fetch("rusak_berat", 0) %></strong></div></section>
-<% max_kendaraan = @kendaraan_per_perangkat.values.max.to_i %><% max_biaya = @biaya_perawatan_per_bulan.values.max.to_f %><section class="insights"><section class="panel"><div class="panel-header"><h2>Kendaraan per Perangkat Daerah</h2></div><ul class="insight-list"><% @kendaraan_per_perangkat.each do |nama, jumlah| %><li><span><%= nama %></span><span class="bar"><i style="width:<%= max_kendaraan.zero? ? 0 : jumlah * 100 / max_kendaraan %>%"></i></span><strong><%= jumlah %></strong></li><% end %><% if @kendaraan_per_perangkat.empty? %><li>Belum ada data kendaraan.</li><% end %></ul></section><section class="panel"><div class="panel-header"><h2>Biaya Perawatan per Bulan</h2></div><ul class="insight-list"><% @biaya_perawatan_per_bulan.each do |bulan, biaya| %><li><span><%= bulan %></span><span class="bar"><i style="width:<%= max_biaya.zero? ? 0 : biaya.to_f * 100 / max_biaya %>%"></i></span><strong><%= number_to_currency biaya || 0, unit: "Rp", precision: 0, delimiter: "." %></strong></li><% end %><% if @biaya_perawatan_per_bulan.empty? %><li>Belum ada biaya perawatan.</li><% end %></ul></section></section>
-<section class="panel"><div class="panel-header"><h2>Kendaraan terbaru</h2><%= link_to "Lihat semua", kendaraan_dinas_index_path, class: "link" %></div><table><thead><tr><th>Nomor polisi</th><th>Kendaraan</th><th>Penanggung jawab</th><th>Status</th></tr></thead><tbody><% @kendaraan_terbaru.each do |kendaraan| %><tr><td><%= link_to kendaraan.nomor_polisi, show_kendaraan_path(kendaraan), class: "link" %></td><td><%= kendaraan.merek %> <%= kendaraan.model %></td><td><%= kendaraan.penanggung_jawab.nama %></td><td><span class="badge badge--<%= kendaraan.status %>"><%= kendaraan.status.titleize %></span></td></tr><% end %><% if @kendaraan_terbaru.empty? %><tr><td colspan="4" class="empty">Belum ada kendaraan. Tambahkan data kendaraan pertama Anda.</td></tr><% end %></tbody></table></section>
-<section class="panel" style="margin-top: 24px"><div class="panel-header"><h2>Perawatan terbaru</h2><%= link_to "Lihat semua", riwayat_perawatans_path, class: "link" %></div><table><thead><tr><th>Tanggal</th><th>Kendaraan</th><th>Jenis</th><th>Biaya</th></tr></thead><tbody><% @riwayat_terbaru.each do |riwayat| %><tr><td><%= riwayat.tanggal.strftime("%d-%m-%Y") %></td><td><%= riwayat.kendaraan_dinas.nomor_polisi %></td><td><%= riwayat.jenis %></td><td><%= number_to_currency riwayat.biaya || 0, unit: "Rp", precision: 0, delimiter: "." %></td></tr><% end %><% if @riwayat_terbaru.empty? %><tr><td colspan="4" class="empty">Belum ada riwayat perawatan.</td></tr><% end %></tbody></table></section>
+
+<% baik = @status_counts.fetch("baik", 0) %>
+<% rusak_ringan = @status_counts.fetch("rusak_ringan", 0) %>
+<% rusak_berat = @status_counts.fetch("rusak_berat", 0) %>
+<% total = @total_kendaraan.nonzero? || 1 %>
+<% baik_persen = baik.fdiv(total) * 100 %>
+<% ringan_persen = rusak_ringan.fdiv(total) * 100 %>
+<% max_biaya = @biaya_perawatan_per_bulan.values.max.to_f %>
+
+<section class="dashboard-hero">
+  <div>
+    <p class="dashboard-kicker">Kendaraan Dinas Operasional</p>
+    <h1>Dasbor KDO</h1>
+    <p>Pantau kesiapan armada, beban perawatan, dan kendaraan yang perlu segera ditindaklanjuti.</p>
+  </div>
+  <div class="dashboard-hero__stats" aria-label="Ringkasan kesiapan armada">
+    <div class="dashboard-hero__stat"><strong><%= @persentase_kesiapan %>%</strong><span>armada kondisi baik</span></div>
+    <div class="dashboard-hero__stat"><strong><%= @kendaraan_perlu_perhatian %></strong><span>perlu perhatian</span></div>
+  </div>
+</section>
+
+<section class="cards dashboard-cards" aria-label="Ringkasan data KDO">
+  <article class="card dashboard-card"><p>Total kendaraan</p><strong><%= @total_kendaraan %></strong><small>aset operasional tercatat</small></article>
+  <article class="card dashboard-card dashboard-card--green"><p>Kondisi baik</p><strong><%= baik %></strong><small><%= @persentase_kesiapan %>% dari seluruh armada</small></article>
+  <article class="card dashboard-card dashboard-card--amber"><p>Perlu perhatian</p><strong><%= @kendaraan_perlu_perhatian %></strong><small>rusak ringan atau berat</small></article>
+  <article class="card dashboard-card dashboard-card--purple"><p>Biaya perawatan</p><strong><%= number_to_currency @total_biaya_perawatan, unit: "Rp", precision: 0, delimiter: "." %></strong><small><%= @total_perawatan %> riwayat tercatat</small></article>
+</section>
+
+<section class="dashboard-grid" aria-label="Grafik ringkasan KDO">
+  <section class="panel chart-panel">
+    <div class="panel-header"><div><h2>Komposisi Kondisi Kendaraan</h2><p class="chart-caption">Sebaran kondisi terkini seluruh armada.</p></div></div>
+    <div class="condition-chart">
+      <div class="donut-chart" style="--baik: <%= baik_persen %>%; --ringan: <%= ringan_persen %>%;" role="img" aria-label="<%= baik %> baik, <%= rusak_ringan %> rusak ringan, <%= rusak_berat %> rusak berat">
+        <div class="donut-chart__hole"><div><strong><%= @total_kendaraan %></strong><span>armada</span></div></div>
+      </div>
+      <div class="condition-legend">
+        <div><span><i style="--legend: #12b76a"></i>Baik</span><strong><%= baik %> kendaraan</strong></div>
+        <div><span><i style="--legend: #f79009"></i>Rusak ringan</span><strong><%= rusak_ringan %> kendaraan</strong></div>
+        <div><span><i style="--legend: #f04438"></i>Rusak berat</span><strong><%= rusak_berat %> kendaraan</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel chart-panel">
+    <div class="panel-header"><div><h2>Tren Biaya Perawatan</h2><p class="chart-caption">Akumulasi biaya pada enam bulan terakhir yang tercatat.</p></div></div>
+    <div class="trend-chart">
+      <% @biaya_perawatan_per_bulan.each do |bulan, biaya| %>
+        <% tinggi = max_biaya.zero? ? 0 : (biaya.to_f / max_biaya * 100).round %>
+        <div class="trend-column" title="<%= bulan %>: <%= number_to_currency biaya, unit: "Rp", precision: 0, delimiter: "." %>">
+          <span><i style="height: <%= tinggi %>%"></i></span>
+          <small><%= bulan.delete_prefix("#{bulan.first(4)}-") %></small>
+        </div>
+      <% end %>
+      <% if @biaya_perawatan_per_bulan.empty? %><p class="trend-empty">Belum ada biaya perawatan untuk divisualisasikan.</p><% end %>
+    </div>
+  </section>
+</section>
+
+<section class="panel attention-panel">
+  <div class="panel-header"><div><h2>Prioritas Tindak Lanjut</h2><p class="chart-caption">Kendaraan yang tidak berstatus baik perlu diperiksa atau dijadwalkan perawatannya.</p></div><%= link_to "Kelola perawatan", riwayat_perawatans_path, class: "link" %></div>
+  <% if @kendaraan_prioritas.any? %>
+    <div class="attention-list">
+      <% @kendaraan_prioritas.each do |kendaraan| %>
+        <article class="attention-item">
+          <p><%= link_to kendaraan.nomor_polisi, show_kendaraan_path(kendaraan), class: "link" %></p>
+          <span class="badge badge--<%= kendaraan.status %>"><%= kendaraan.status.titleize %></span>
+          <small><%= kendaraan.merek %> <%= kendaraan.model %> · <%= kendaraan.perangkat_daerah.nama %></small>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="attention-empty">Seluruh kendaraan tercatat dalam kondisi baik.</p>
+  <% end %>
+</section>
+
+<section class="dashboard-grid">
+  <% max_kendaraan = @kendaraan_per_perangkat.values.max.to_i %>
+  <section class="panel">
+    <div class="panel-header"><h2>Armada per Perangkat Daerah</h2></div>
+    <ul class="insight-list">
+      <% @kendaraan_per_perangkat.each do |nama, jumlah| %>
+        <li><span><%= nama %></span><span class="bar"><i style="width:<%= max_kendaraan.zero? ? 0 : jumlah * 100 / max_kendaraan %>%"></i></span><strong><%= jumlah %></strong></li>
+      <% end %>
+      <% if @kendaraan_per_perangkat.empty? %><li>Belum ada data kendaraan.</li><% end %>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header"><h2>Riwayat Perawatan Terbaru</h2><%= link_to "Lihat semua", riwayat_perawatans_path, class: "link" %></div>
+    <table><thead><tr><th>Tanggal</th><th>Kendaraan</th><th>Jenis</th><th>Biaya</th></tr></thead><tbody>
+      <% @riwayat_terbaru.each do |riwayat| %>
+        <tr><td><%= riwayat.tanggal.strftime("%d-%m-%Y") %></td><td><%= riwayat.kendaraan_dinas.nomor_polisi %></td><td><%= riwayat.jenis %></td><td><%= number_to_currency riwayat.biaya || 0, unit: "Rp", precision: 0, delimiter: "." %></td></tr>
+      <% end %>
+      <% if @riwayat_terbaru.empty? %><tr><td colspan="4" class="empty">Belum ada riwayat perawatan.</td></tr><% end %>
+    </tbody></table>
+  </section>
+</section>
+
+<section class="panel dashboard-table">
+  <div class="panel-header"><h2>Kendaraan Terbaru</h2><%= link_to "Lihat semua", kendaraan_dinas_index_path, class: "link" %></div>
+  <table><thead><tr><th>Nomor polisi</th><th>Kendaraan</th><th>Penanggung jawab</th><th>Status</th></tr></thead><tbody>
+    <% @kendaraan_terbaru.each do |kendaraan| %>
+      <tr><td><%= link_to kendaraan.nomor_polisi, show_kendaraan_path(kendaraan), class: "link" %></td><td><%= kendaraan.merek %> <%= kendaraan.model %></td><td><%= kendaraan.penanggung_jawab.nama %></td><td><span class="badge badge--<%= kendaraan.status %>"><%= kendaraan.status.titleize %></span></td></tr>
+    <% end %>
+    <% if @kendaraan_terbaru.empty? %><tr><td colspan="4" class="empty">Belum ada kendaraan. Tambahkan data kendaraan pertama Anda.</td></tr><% end %>
+  </tbody></table>
+</section>

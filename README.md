@@ -36,6 +36,8 @@ bin/rails routes
 bin/rails db:reset db:seed
 ```
 
+Seed demonstrasi bersifat idempoten dan menyediakan variasi data kendaraan, kondisi, serta biaya perawatan lintas enam bulan untuk memvisualisasikan dasbor. Seluruh data seed adalah fiktif dan bukan untuk penggunaan produksi.
+
 `db:reset` menghapus database development lokal, jadi gunakan hanya saat memang ingin membuat data ulang.
 
 ## Model data

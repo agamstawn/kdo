@@ -11,7 +11,7 @@ bin/rails db:seed
 bin/rails server
 ```
 
-Buka `http://localhost:3000`. Seed bersifat idempoten dan memuat tiga perangkat daerah, empat pegawai fiktif, tiga kendaraan, dan tiga riwayat perawatan.
+Buka `http://localhost:3000`. Seed bersifat idempoten dan memuat tiga perangkat daerah, sembilan pegawai fiktif, sebelas kendaraan, dan dua belas riwayat perawatan lintas bulan sehingga grafik dasbor terisi.
 
 ## 2. Alur demonstrasi
 
