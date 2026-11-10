@@ -46,7 +46,7 @@ bin/rails db:reset db:seed
 | Pegawai | nama, NIP, jabatan, golongan | Milik satu perangkat daerah; dapat menjadi penanggung jawab kendaraan |
 | Kendaraan Dinas | nomor polisi, merek, model, tahun produksi, warna, status | Milik satu perangkat daerah dan satu pegawai penanggung jawab |
 
-Status kendaraan yang didukung: `baik`, `perlu_perawatan`, `rusak`, dan `tidak_aktif`.
+Status kendaraan yang didukung: `baik`, `rusak_ringan`, dan `rusak_berat`.
 
 ## REST API
 
@@ -98,3 +98,6 @@ Contoh prompt:
 - `app/views`: antarmuka CRUD server-rendered.
 - `db/migrate`: struktur SQLite dan constraint data.
 - `AGENTS.md`: instruksi untuk asisten AI yang mengerjakan proyek.
+- `docs/MANUAL_SETUP.md`: panduan instalasi dan demonstrasi aplikasi.
+- `docs/API.md`: kontrak endpoint REST API.
+- `db/dumps/kdo_sample.sql`: dump SQLite data demonstrasi fiktif.
