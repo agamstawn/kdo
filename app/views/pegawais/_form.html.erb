@@ -1,0 +1,5 @@
+<%= form_with model: pegawai, class: "form-card" do |form| %>
+  <% if pegawai.errors.any? %><div class="error-box"><%= pegawai.errors.full_messages.to_sentence %></div><% end %>
+  <div class="form-grid"><div class="field"><%= form.label :nama, "Nama pegawai" %><%= form.text_field :nama, autofocus: true %></div><div class="field"><%= form.label :nip, "NIP (18 digit)" %><%= form.text_field :nip, inputmode: "numeric", maxlength: 18 %></div><div class="field"><%= form.label :jabatan %><%= form.text_field :jabatan %></div><div class="field"><%= form.label :golongan %><%= form.text_field :golongan, placeholder: "Contoh: III/a" %></div><div class="field field--wide"><%= form.label :perangkat_daerah_id, "Perangkat daerah" %><%= form.collection_select :perangkat_daerah_id, PerangkatDaerah.order(:nama), :id, :nama, { prompt: "Pilih perangkat daerah" } %></div></div>
+  <div class="form-actions"><%= form.submit "Simpan", class: "button" %><%= link_to "Batal", pegawais_path, class: "button button--secondary" %></div>
+<% end %>
