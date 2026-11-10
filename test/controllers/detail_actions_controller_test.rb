@@ -24,17 +24,21 @@ class DetailActionsControllerTest < ActionDispatch::IntegrationTest
     get perangkat_daerah_url(@perangkat_daerah)
     assert_response :success
     assert_select "h1", @perangkat_daerah.nama
+    assert_select "a", "Kembali ke perangkat daerah"
 
     get pegawai_url(@pegawai)
     assert_response :success
     assert_select "h1", @pegawai.nama
+    assert_select "a", "Kembali ke pegawai"
 
     get show_kendaraan_url(@kendaraan)
     assert_response :success
     assert_select "h1", @kendaraan.nomor_polisi
+    assert_select "a", "Kembali ke kendaraan"
 
     get riwayat_perawatan_url(@riwayat)
     assert_response :success
     assert_select "h1", @riwayat.jenis
+    assert_select "a", "Kembali ke perawatan"
   end
 end
