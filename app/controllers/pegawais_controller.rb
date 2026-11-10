@@ -2,7 +2,9 @@ class PegawaisController < ApplicationController
   before_action :set_pegawai, only: %i[show edit update destroy]
 
   def index
-    @pegawais = Pegawai.includes(:perangkat_daerah).order(:nama)
+    scope = Pegawai.includes(:perangkat_daerah).search(params[:q]).for_perangkat_daerah(params[:perangkat_daerah_id]).order(:nama)
+    @pagination = paginate(scope)
+    @pegawais = @pagination.records
   end
 
   def show; end

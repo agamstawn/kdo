@@ -2,7 +2,8 @@ class Api::V1::PegawaisController < Api::V1::BaseController
   before_action :set_record, only: %i[show update destroy]
 
   def index
-    render json: Pegawai.includes(:perangkat_daerah).order(:nama), include: :perangkat_daerah
+    scope = Pegawai.includes(:perangkat_daerah).search(params[:q]).for_perangkat_daerah(params[:perangkat_daerah_id]).order(:nama)
+    render_collection(scope, include: :perangkat_daerah)
   end
 
   def show

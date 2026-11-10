@@ -2,7 +2,7 @@ class Api::V1::PerangkatDaerahsController < Api::V1::BaseController
   before_action :set_record, only: %i[show update destroy]
 
   def index
-    render json: PerangkatDaerah.order(:nama)
+    render_collection(PerangkatDaerah.search(params[:q]).order(:nama))
   end
 
   def show

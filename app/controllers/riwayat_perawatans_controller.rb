@@ -2,13 +2,15 @@ class RiwayatPerawatansController < ApplicationController
   before_action :set_riwayat_perawatan, only: %i[show edit update destroy]
 
   def index
-    @riwayat_perawatans = RiwayatPerawatan.includes(kendaraan_dinas: :perangkat_daerah).order(tanggal: :desc)
+    scope = RiwayatPerawatan.includes(kendaraan_dinas: :perangkat_daerah).search(params[:q]).for_kendaraan(params[:kendaraan_dinas_id]).order(tanggal: :desc)
+    @pagination = paginate(scope)
+    @riwayat_perawatans = @pagination.records
   end
 
   def show; end
 
   def new
-    @riwayat_perawatan = RiwayatPerawatan.new(tanggal: Date.current)
+    @riwayat_perawatan = RiwayatPerawatan.new(tanggal: Date.current, kendaraan_dinas_id: params[:kendaraan_dinas_id])
   end
 
   def edit; end

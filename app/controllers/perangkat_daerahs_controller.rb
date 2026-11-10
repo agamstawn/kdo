@@ -2,7 +2,8 @@ class PerangkatDaerahsController < ApplicationController
   before_action :set_perangkat_daerah, only: %i[show edit update destroy]
 
   def index
-    @perangkat_daerahs = PerangkatDaerah.order(:nama)
+    @pagination = paginate(PerangkatDaerah.search(params[:q]).order(:nama))
+    @perangkat_daerahs = @pagination.records
   end
 
   def show; end

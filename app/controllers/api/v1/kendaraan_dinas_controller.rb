@@ -2,7 +2,8 @@ class Api::V1::KendaraanDinasController < Api::V1::BaseController
   before_action :set_record, only: %i[show update destroy]
 
   def index
-    render json: KendaraanDinas.includes(:perangkat_daerah, :penanggung_jawab).order(:nomor_polisi), include: %i[perangkat_daerah penanggung_jawab]
+    scope = KendaraanDinas.includes(:perangkat_daerah, :penanggung_jawab).search(params[:q]).by_status(params[:status]).for_perangkat_daerah(params[:perangkat_daerah_id]).order(:nomor_polisi)
+    render_collection(scope, include: %i[perangkat_daerah penanggung_jawab])
   end
 
   def show

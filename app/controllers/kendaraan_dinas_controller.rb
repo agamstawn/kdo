@@ -2,10 +2,15 @@ class KendaraanDinasController < ApplicationController
   before_action :set_kendaraan_dinas, only: %i[show edit update destroy]
 
   def index
-    @kendaraan_dinas = KendaraanDinas.includes(:perangkat_daerah, :penanggung_jawab).order(:nomor_polisi)
+    scope = KendaraanDinas.includes(:perangkat_daerah, :penanggung_jawab).search(params[:q]).by_status(params[:status]).for_perangkat_daerah(params[:perangkat_daerah_id]).order(:nomor_polisi)
+    @pagination = paginate(scope)
+    @kendaraan_dinas = @pagination.records
   end
 
-  def show; end
+  def show
+    @riwayat_perawatans = @kendaraan_dinas.riwayat_perawatans.order(tanggal: :desc)
+    @total_biaya_perawatan = @riwayat_perawatans.sum(:biaya)
+  end
 
   def new
     @kendaraan_dinas = KendaraanDinas.new

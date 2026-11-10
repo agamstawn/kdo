@@ -46,6 +46,20 @@
           document.querySelectorAll(input.dataset.tableSearch + ' tbody tr').forEach((row) => row.hidden = !row.innerText.toLowerCase().includes(term));
         });
       });
+      document.querySelectorAll('[data-vehicle-form]').forEach((form) => {
+        const agency = form.querySelector('[data-perangkat-daerah-select]');
+        const employee = form.querySelector('[data-penanggung-jawab-select]');
+        const filterEmployees = () => {
+          employee.querySelectorAll('option[data-perangkat-daerah-id]').forEach((option) => {
+            const visible = !agency.value || option.dataset.perangkatDaerahId === agency.value;
+            option.hidden = !visible;
+            option.disabled = !visible;
+            if (!visible && option.selected) employee.value = '';
+          });
+        };
+        agency.addEventListener('change', filterEmployees);
+        filterEmployees();
+      });
     </script>
   </body>
 </html>

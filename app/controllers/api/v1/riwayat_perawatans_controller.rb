@@ -2,7 +2,8 @@ class Api::V1::RiwayatPerawatansController < Api::V1::BaseController
   before_action :set_record, only: %i[show update destroy]
 
   def index
-    render json: RiwayatPerawatan.includes(:kendaraan_dinas).order(tanggal: :desc), include: :kendaraan_dinas
+    scope = RiwayatPerawatan.includes(:kendaraan_dinas).search(params[:q]).for_kendaraan(params[:kendaraan_dinas_id]).order(tanggal: :desc)
+    render_collection(scope, include: :kendaraan_dinas)
   end
 
   def show

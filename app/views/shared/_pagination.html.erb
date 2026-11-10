@@ -1,0 +1,10 @@
+<% if pagination.total_count.positive? %>
+  <nav class="pagination" aria-label="Navigasi halaman">
+    <span>Menampilkan <%= pagination.records.size %> dari <%= pagination.total_count %> data</span>
+    <div>
+      <% if pagination.page > 1 %><%= link_to "← Sebelumnya", url_for(request.query_parameters.merge(page: pagination.page - 1)), class: "link" %><% end %>
+      <span>Halaman <%= pagination.page %> / <%= pagination.total_pages %></span>
+      <% if pagination.page < pagination.total_pages %><%= link_to "Berikutnya →", url_for(request.query_parameters.merge(page: pagination.page + 1)), class: "link" %><% end %>
+    </div>
+  </nav>
+<% end %>
