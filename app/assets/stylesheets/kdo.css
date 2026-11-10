@@ -15,3 +15,25 @@
 .insight-list li { display: grid; grid-template-columns: 1fr 2fr auto; align-items: center; gap: 10px; padding: 10px 0; font-size: 14px; }
 .bar { height: 8px; overflow: hidden; border-radius: 20px; background: #e8edf6; }.bar i { display: block; height: 100%; border-radius: inherit; background: var(--blue); }
 @media (max-width: 720px) { .insights { grid-template-columns: 1fr; } .pagination { align-items: flex-start; flex-direction: column; } }
+
+td.actions {
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  min-width: 148px;
+  white-space: nowrap;
+}
+
+td.actions .link,
+td.actions form {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  margin: 0;
+}
+
+td.actions .button {
+  min-height: 38px;
+  padding: 8px 12px;
+  line-height: 1;
+}

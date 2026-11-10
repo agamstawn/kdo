@@ -13,10 +13,10 @@ Base URL: `/api/v1`. Semua request dan respons memakai JSON.
 
 | Resource | Collection | Member |
 | --- | --- | --- |
-| Perangkat daerah | `GET`, `POST /perangkat_daerahs` | `GET`, `PATCH`, `DELETE /perangkat_daerahs/:id` |
-| Pegawai | `GET`, `POST /pegawais` | `GET`, `PATCH`, `DELETE /pegawais/:id` |
-| Kendaraan dinas | `GET`, `POST /kendaraan_dinas` | `GET`, `PATCH`, `DELETE /kendaraan_dinas/:id` |
-| Riwayat perawatan | `GET`, `POST /riwayat_perawatans` | `GET`, `PATCH`, `DELETE /riwayat_perawatans/:id` |
+| Perangkat daerah | `GET`, `POST /perangkat-daerah` | `GET`, `PATCH`, `DELETE /perangkat-daerah/:id` |
+| Pegawai | `GET`, `POST /pegawai` | `GET`, `PATCH`, `DELETE /pegawai/:id` |
+| Kendaraan dinas | `GET`, `POST /kendaraan` | `GET`, `PATCH`, `DELETE /kendaraan/:id` |
+| Riwayat perawatan | `GET`, `POST /perawatan` | `GET`, `PATCH`, `DELETE /perawatan/:id` |
 
 Tambahkan prefix `/api/v1` pada seluruh path pada tabel.
 

@@ -54,9 +54,9 @@ Semua endpoint mengirim dan menerima JSON di bawah `/api/v1`.
 
 | Resource | Endpoint |
 | --- | --- |
-| Perangkat daerah | `GET/POST /api/v1/perangkat_daerahs`, `GET/PATCH/DELETE /api/v1/perangkat_daerahs/:id` |
-| Pegawai | `GET/POST /api/v1/pegawais`, `GET/PATCH/DELETE /api/v1/pegawais/:id` |
-| Kendaraan | `GET/POST /api/v1/kendaraan_dinas`, `GET/PATCH/DELETE /api/v1/kendaraan_dinas/:id` |
+| Perangkat daerah | `GET/POST /api/v1/perangkat-daerah`, `GET/PATCH/DELETE /api/v1/perangkat-daerah/:id` |
+| Pegawai | `GET/POST /api/v1/pegawai`, `GET/PATCH/DELETE /api/v1/pegawai/:id` |
+| Kendaraan | `GET/POST /api/v1/kendaraan`, `GET/PATCH/DELETE /api/v1/kendaraan/:id` |
 
 Contoh payload pembuatan kendaraan:
 

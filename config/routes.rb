@@ -1,23 +1,23 @@
 Rails.application.routes.draw do
   root "dashboard#index"
-  resources :perangkat_daerahs
-  resources :pegawais
-  get "kendaraan_dinas", to: "kendaraan_dinas#index", as: :kendaraan_dinas_index
-  post "kendaraan_dinas", to: "kendaraan_dinas#create"
-  get "kendaraan_dinas/new", to: "kendaraan_dinas#new", as: :new_kendaraan_dinas
-  get "kendaraan_dinas/:id/edit", to: "kendaraan_dinas#edit", as: :edit_kendaraan_dinas
-  get "kendaraan_dinas/:id", to: "kendaraan_dinas#show", as: :show_kendaraan
-  patch "kendaraan_dinas/:id", to: "kendaraan_dinas#update"
-  put "kendaraan_dinas/:id", to: "kendaraan_dinas#update"
-  delete "kendaraan_dinas/:id", to: "kendaraan_dinas#destroy"
-  resources :riwayat_perawatans
+  resources :perangkat_daerahs, path: "perangkat-daerah"
+  resources :pegawais, path: "pegawai"
+  get "kendaraan", to: "kendaraan_dinas#index", as: :kendaraan_dinas_index
+  post "kendaraan", to: "kendaraan_dinas#create"
+  get "kendaraan/new", to: "kendaraan_dinas#new", as: :new_kendaraan_dinas
+  get "kendaraan/:id/edit", to: "kendaraan_dinas#edit", as: :edit_kendaraan_dinas
+  get "kendaraan/:id", to: "kendaraan_dinas#show", as: :show_kendaraan
+  patch "kendaraan/:id", to: "kendaraan_dinas#update"
+  put "kendaraan/:id", to: "kendaraan_dinas#update"
+  delete "kendaraan/:id", to: "kendaraan_dinas#destroy"
+  resources :riwayat_perawatans, path: "perawatan"
 
   namespace :api do
     namespace :v1 do
-      resources :perangkat_daerahs
-      resources :pegawais
-      resources :kendaraan_dinas
-      resources :riwayat_perawatans
+      resources :perangkat_daerahs, path: "perangkat-daerah"
+      resources :pegawais, path: "pegawai"
+      resources :kendaraan_dinas, path: "kendaraan"
+      resources :riwayat_perawatans, path: "perawatan"
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
